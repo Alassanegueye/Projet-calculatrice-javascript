@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculatrice</title>
+  <style>
+    .container {
+      display: flex;
+    }
+
+    .error-container {
+      flex: 1;
+      padding: 10px;
+      background-color: #f8d7da;
+    }
+
+    .form-container {
+      flex: 2;
+      padding: 10px;
+    }
+
+    .form-container label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form-container input,
+    .form-container select {
+      margin-bottom: 10px;
+      padding: 5px;
+      width: 100%;
+    }
+
+    .form-container .error-message {
+      color: red;
+    }
+
+    .form-container button {
+      padding: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .form-container button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    body {
+      background-color: rgb(215, 207, 232);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      background-color: white;
+      padding: 70px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px black;
+    }
+
+    h4 {
+      text-align: center;
+      font-size: 20px;
+    }
+
+    hr {
+      margin: 10px 0;
+      background-color: black;
+      border: 0;
+      height: 1px;
+      width: 100%;
+    }
+
+    .name-field {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .name-field div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .name-field div input {
+      width: 49%;
+    }
+
+    label {
+      margin-bottom: 6px;
+    }
+
+    .resultats-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="error-container">
+      <h3>Erreurs :</h3>
+      <ul id="error-list"></ul>
+    </div>
+
+    <div class="form-container">
+      <form id="monFormulaire">
+        <label for="Nombre1">Nombre1:</label>
+        <input type="number" id="Nombre1" required>
+        <br>
+        <div id="Nombre1-error" class="error-message"></div>
+
+        <label for="Nombre2">Nombre2:</label>
+        <input type="number" id="Nombre2" required>
+        <br>
+        <div id="Nombre2-error" class="error-message"></div>
+
+        <label for="Operateurs">Opérateurs:</label>
+        <select id="Operateurs" required>
+          <option value="">Sélectionnez</option>
+          <option value="Addition">Addition</option>
+          <option value="Soustraction">Soustraction</option>
+          <option value="Division">Division</option>
+          <option value="Multiplication">Multiplication</option>
+        </select>
+        <br>
+        <div id="Operateurs-error" class="error-message"></div>
+
+        <br>
+
+        <button type="button" onclick="calculer()" disabled>Calculer</button>
+        <div id="resultats" class="resultats-container"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    var formulaire = document.getElementById("monFormulaire");
+    var boutonCalculer = document.querySelector("button");
+
+    formulaire.addEventListener("change", function() {
+      verifierErreurs();
+    });
+
+    boutonCalculer.addEventListener("click", function() {
+      calculer();
+    });
+
+    function verifierErreurs() {
+      var errorList = document.getElementById("error-list");
+      errorList.innerHTML = "";
+
+      var erreurs = [];
+
+      var nombre1 = parseFloat(document.getElementById("Nombre1").value);
+      var nombre2 = parseFloat(document.getElementById("Nombre2").value);
+      var operateurs = document.getElementById("Operateurs").value;
+
+      if (isNaN(nombre1)) {
+        erreurs.push("Veuillez saisir un nombre valide pour Nombre1.");
+        document.getElementById("Nombre1-error").textContent = "Veuillez saisir un nombre valide.";
+      } else {
+        document.getElementById("Nombre1-error").textContent = "";
+      }
+
+      if (isNaN(nombre2)) {
+        erreurs.push("Veuillez saisir un nombre valide pour Nombre2.");
+        document.getElementById("Nombre2-error").textContent = "Veuillez saisir un nombre valide.";
+      } else {
+        document.getElementById("Nombre2-error").textContent = "";
+      }
+
+      if (operateurs === "") {
+        erreurs.push("Veuillez sélectionner un opérateur.");
+        document.getElementById("Operateurs-error").textContent = "Veuillez sélectionner un opérateur.";
+      } else {
+        document.getElementById("Operateurs-error").textContent = "";
+      }
+
+      // Ajout de la vérification pour la division par zéro
+      if (operateurs === "Division" && nombre2 === 0) {
+        erreurs.push("la division par zéro est impossible.");
+        document.getElementById("Operateurs-error").textContent = "la division par zéro est impossible.";
+      }
+
+      if (erreurs.length > 0) {
+        boutonCalculer.setAttribute("disabled", true);
+
+        erreurs.forEach(function(erreur) {
+          var li = document.createElement("li");
+          li.textContent = erreur;
+          errorList.appendChild(li);
+        });
+      } else {
+        boutonCalculer.removeAttribute("disabled");
+      }
+    }
+
+    function calculer() {
+      var nombre1 = parseFloat(document.getElementById("Nombre1").value);
+      var nombre2 = parseFloat(document.getElementById("Nombre2").value);
+      var operateurs = document.getElementById("Operateurs").value;
+
+      var resultatsContainer = document.getElementById("resultats");
+      resultatsContainer.innerHTML = "";
+
+      if (operateurs === "Addition") {
+        var somme = nombre1 + nombre2;
+        resultatsContainer.textContent = "La somme est : " + somme;
+      } else if (operateurs === "Soustraction") {
+        var difference = nombre1 - nombre2;
+        resultatsContainer.textContent = "La différence est : " + difference;
+      } else if (operateurs === "Division") {
+        if (nombre2 !== 0) {
+          var quotient = nombre1 / nombre2;
+          resultatsContainer.textContent = "Le quotient est : " + quotient;
+        } else {
+          resultatsContainer.textContent = "Erreur : Division par zéro.";
+        }
+      } else if (operateurs === "Multiplication") {
+        var produit = nombre1 * nombre2;
+        resultatsContainer.textContent = "Le produit est : " + produit;
+      }
+    }
+  </script>
+</body>
+</html>
+
+
